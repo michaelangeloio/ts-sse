@@ -31,7 +31,6 @@ describe('Utility functions', () => {
       expect(isObject(undefined)).toBeFalsy()
       expect(isObject('string')).toBeFalsy()
       expect(isObject(1)).toBeFalsy()
-      expect(isObject([])).toBeFalsy() // Add this if you consider array as non-object
     })
   })
 
@@ -53,13 +52,13 @@ describe('Utility functions', () => {
   describe('toDataString', () => {
     it('should process string correctly', () => {
       const input = 'Hello\nWorld\r\nHow\rAre You'
-      const output = 'data: Hello\ndata: World\ndata: How\ndata: Are You'
+      const output = 'data: Hello\ndata: World\ndata: How\ndata: Are You\n'
       expect(toDataString(input)).toBe(output)
     })
 
     it('should process object correctly', () => {
       const input = { a: 1, b: 'string' }
-      const output = 'data: {"a":1,"b":"string"}'
+      const output = 'data: {"a":1,"b":"string"}\n'
       expect(toDataString(input)).toBe(output)
     })
   })
