@@ -7,6 +7,19 @@ export interface Message<T = string | Record<string, unknown>> {
   id?: string
   retry?: number
 }
+
+export interface Message<T = string | Record<string, unknown>> {
+  data: T
+  comment?: string
+  event?: string
+  id?: string
+  retry?: number
+}
+export type EventOptions<T = string | Record<string, unknown>> = {
+  beforeFn?: CustomFn<T>
+  afterFn?: CustomFn<T>
+}
+
 export interface EventNotifier<
   T extends {
     update: T['update'] extends Message ? Message<T['update']>['data'] : never
@@ -17,16 +30,25 @@ export interface EventNotifier<
     close: T['close'] extends Message ? Message<T['close']>['data'] : never
   } = any
 > {
-  update: (message: Message<T['update']>['data'], customFn?: CustomFn) => void
+  update: (
+    message: Message<T['update']>['data'],
+    opts?: EventOptions<Message<T['update']>['data']>
+  ) => void
   complete: (
     message: Message<T['complete']>['data'],
-    customFn?: CustomFn
+    opts?: EventOptions<Message<T['complete']>['data']>
   ) => void
-  error: (message: Message<T['error']>['data'], customFn?: CustomFn) => void
-  close: (message: Message<T['close']>['data'], customFn?: CustomFn) => void
+  error: (
+    message: Message<T['error']>['data'],
+    opts?: EventOptions<Message<T['error']>['data']>
+  ) => void
+  close: (
+    message: Message<T['close']>['data'],
+    opts?: EventOptions<Message<T['close']>['data']>
+  ) => void
 }
 
-type CustomFn = (any: unknown) => unknown
+type CustomFn<T = string | Record<string, unknown>> = (data: T) => unknown
 
 export class Writer implements EventNotifier {
   constructor(
@@ -56,32 +78,44 @@ export class Writer implements EventNotifier {
     }
   }
 
-  update(message: any, customFn?: CustomFn) {
-    if (customFn) {
-      customFn(message.data)
+  update(message: Message, opts?: EventOptions<any>) {
+    if (opts?.beforeFn) {
+      opts.beforeFn(message)
     }
     this.writeMessage(this.writer, this.encoder, message)
-  }
-
-  complete(message: any, customFn?: CustomFn) {
-    if (customFn) {
-      customFn(message)
+    if (opts?.afterFn) {
+      opts.afterFn(message)
     }
-    this.writeMessage(this.writer, this.encoder, message)
-    void this.writer.close()
   }
 
-  error(message: any, customFn?: CustomFn) {
-    if (customFn) {
-      customFn(message)
+  complete(message: Message, opts?: EventOptions<any>) {
+    if (opts?.beforeFn) {
+      opts.beforeFn(message)
     }
     this.writeMessage(this.writer, this.encoder, message)
     void this.writer.close()
+    if (opts?.afterFn) {
+      opts.afterFn(message)
+    }
   }
 
-  close(data: any, customFn?: CustomFn) {
-    if (customFn) {
-      customFn(data)
+  error(message: Message, opts?: EventOptions<any>) {
+    if (opts?.beforeFn) {
+      opts.beforeFn(message)
+    }
+    this.writeMessage(this.writer, this.encoder, message)
+    if (opts?.afterFn) {
+      opts.afterFn(message)
+    }
+    void this.writer.close()
+  }
+
+  close(message: Message, opts?: EventOptions<any>) {
+    if (opts?.beforeFn) {
+      opts.beforeFn(message.data)
+    }
+    if (opts?.afterFn) {
+      opts.afterFn(message.data)
     }
     void this.writer.close()
   }
