@@ -1,6 +1,6 @@
 {
   "name": "ts-sse",
-  "version": "0.0.1",
+  "version": "0.0.01",
   "description": "A template for creating npm packages using TypeScript and VSCode",
   "main": "./lib/index.js",
   "files": [
@@ -12,7 +12,7 @@
     "cm": "cz",
     "lint": "eslint ./src/ --fix",
     "prepare": "husky install",
-    "semantic-release": "semantic-release",
+    "release": "npm run build && changeset publish",
     "test:watch": "jest --watch",
     "test": "jest --coverage",
     "typecheck": "tsc --noEmit"
@@ -118,5 +118,8 @@
       "@semantic-release/npm",
       "@semantic-release/github"
     ]
+  },
+  "dependencies": {
+    "@changesets/cli": "^2.26.2"
   }
 }
