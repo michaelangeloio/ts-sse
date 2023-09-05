@@ -54,6 +54,7 @@ const syncSchema = z.object({
 
 #### Define Your Event Types
 ```ts
+//api/stream/types.ts
 type SyncEvents = EventNotifier<{
   update: {
     data: z.infer<typeof syncSchema>
@@ -89,6 +90,9 @@ Now, let's dive into some Next! Create a function that will handle the SSE logic
 
 ```ts
 // api/stream/route.ts
+import { EventNotifier, getSSEWriter } from 'ts-sse'
+import { syncSchema, SyncEvents } from './types'
+
 export async function GET() {
   // ... (authentication and other logic)
 
@@ -119,7 +123,7 @@ export async function GET() {
   };
 
   // Use the getSSEWriter to initialize the utility with the writer
-  syncStatusStream(getSSEWriter(writer, encoder));
+  syncStatusStream(getSSEWriter(writer, encoder)); // 👈 inject encoder and writer into `getSSEWriter` factory
 
   // Return the response stream
   return new NextResponse(responseStream.readable, {
