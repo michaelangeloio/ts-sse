@@ -8,13 +8,6 @@ export interface Message<T = string | Record<string, unknown>> {
   retry?: number
 }
 
-export interface Message<T = string | Record<string, unknown>> {
-  data: T
-  comment?: string
-  event?: string
-  id?: string
-  retry?: number
-}
 export type EventOptions<T = string | Record<string, unknown>> = {
   beforeFn?: CustomFn<T>
   afterFn?: CustomFn<T>
@@ -28,7 +21,7 @@ export interface EventNotifier<
       : never
     error: T['error'] extends Message ? Message<T['error']>['data'] : never
     close: T['close'] extends Message ? Message<T['close']>['data'] : never
-  } = any,
+  } = any
 > {
   update: (
     message: Message<T['update']>['data'],
