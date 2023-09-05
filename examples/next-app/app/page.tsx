@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { StreamClient } from './streamClient'
+import { StreamClient } from './StreamClient'
 
 export default function Home() {
   return (
