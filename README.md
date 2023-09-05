@@ -202,4 +202,4 @@ const SomeComponent = () => {
 
 ## API
 
-See here for the full API: [API.md](./api.md)
+See here for the full API: [API.md](./docs/api.md)
