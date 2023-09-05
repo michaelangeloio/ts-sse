@@ -1,5 +1,11 @@
 # ts-sse
 
+## 0.0.3
+
+### Patch Changes
+
+- bbfe681: fix changeset
+
 ## 0.0.2
 
 ### Patch Changes
