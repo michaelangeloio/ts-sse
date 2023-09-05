@@ -52,13 +52,14 @@ describe('Utility functions', () => {
   describe('toDataString', () => {
     it('should process string correctly', () => {
       const input = 'Hello\nWorld\r\nHow\rAre You'
-      const output = 'data: Hello\ndata: World\ndata: How\ndata: Are You\n'
+      const output =
+        'data: Hello\n\ndata: World\n\ndata: How\n\ndata: Are You\n\n'
       expect(toDataString(input)).toBe(output)
     })
 
     it('should process object correctly', () => {
       const input = { a: 1, b: 'string' }
-      const output = 'data: {"a":1,"b":"string"}\n'
+      const output = 'data: {"a":1,"b":"string"}\n\n'
       expect(toDataString(input)).toBe(output)
     })
   })
