@@ -26,7 +26,7 @@ npm install ts-sse
 
 ### Prerequisites
 - have TypeScript.
-- A basic understanding of [Server-Sent Events "SSE"(https://html.spec.whatwg.org/multipage/server-sent-events.html)) and the [EventSource Web API](https://developer.mozilla.org/en-US/docs/Web/API/EventSource).
+- A basic understanding of [Server-Sent Events "SSE"](https://html.spec.whatwg.org/multipage/server-sent-events.html) and the [EventSource Web API](https://developer.mozilla.org/en-US/docs/Web/API/EventSource).
 
 
 ### Nextjs Example
