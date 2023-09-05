@@ -1,6 +1,6 @@
 {
   "name": "ts-sse",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "utilities for Server Sent Events that adopts the HTML Spec Standard for the EventSource Web API.",
   "main": "./lib/index.js",
   "files": [

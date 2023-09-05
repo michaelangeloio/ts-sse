@@ -1,5 +1,11 @@
 # ts-sse
 
+## 0.0.2
+
+### Patch Changes
+
+- 3162c70: publish via changeset
+
 ## 0.0.1
 
 ### Patch Changes
