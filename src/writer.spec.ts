@@ -28,10 +28,12 @@ describe('Writer class', () => {
     })
 
     it('should handle with customFn', () => {
-      const customFn = jest.fn()
+      const beforeFn = jest.fn()
+      const afterFn = jest.fn()
       const mockMessage = { data: 'testData' }
-      writerInstance.update(mockMessage, customFn)
-      expect(customFn).toHaveBeenCalledWith(mockMessage.data)
+      writerInstance.update(mockMessage, { beforeFn, afterFn })
+      expect(beforeFn).toHaveBeenCalledWith(mockMessage)
+      expect(afterFn).toHaveBeenCalledWith(mockMessage)
     })
   })
 
@@ -45,10 +47,12 @@ describe('Writer class', () => {
     })
 
     it('should handle with customFn', () => {
-      const customFn = jest.fn()
+      const beforeFn = jest.fn()
+      const afterFn = jest.fn()
       const mockMessage = { data: 'testData' }
-      writerInstance.complete(mockMessage, customFn)
-      expect(customFn).toHaveBeenCalledWith(mockMessage)
+      writerInstance.complete(mockMessage, { beforeFn, afterFn })
+      expect(beforeFn).toHaveBeenCalledWith(mockMessage)
+      expect(afterFn).toHaveBeenCalledWith(mockMessage)
     })
   })
 
@@ -62,25 +66,34 @@ describe('Writer class', () => {
     })
 
     it('should handle with customFn', () => {
-      const customFn = jest.fn()
+      const beforeFn = jest.fn()
+      const afterFn = jest.fn()
       const mockMessage = { data: 'testError' }
-      writerInstance.error(mockMessage, customFn)
-      expect(customFn).toHaveBeenCalledWith(mockMessage)
+      writerInstance.error(mockMessage, { beforeFn, afterFn })
+      expect(beforeFn).toHaveBeenCalledWith(mockMessage)
     })
   })
 
   describe('close', () => {
     it('should handle without customFn', () => {
       const mockData = 'closeData'
-      writerInstance.close(mockData)
+      writerInstance.close({ data: mockData })
       expect(mockWriter.close).toHaveBeenCalled()
     })
 
     it('should handle with customFn', () => {
-      const customFn = jest.fn()
+      const beforeFn = jest.fn()
+      const afterFn = jest.fn()
       const mockData = 'closeData'
-      writerInstance.close(mockData, customFn)
-      expect(customFn).toHaveBeenCalledWith(mockData)
+      writerInstance.close(
+        { data: mockData },
+        {
+          beforeFn: beforeFn,
+          afterFn: afterFn,
+        }
+      )
+      expect(beforeFn).toHaveBeenCalledWith(mockData)
+      expect(afterFn).toHaveBeenCalledWith(mockData)
     })
   })
 
