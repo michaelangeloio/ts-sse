@@ -1,5 +1,11 @@
 # ts-sse
 
+## 0.0.5
+
+### Patch Changes
+
+- e7f4038: fix: duplicate type in source, 0.0.5 release
+
 ## 0.0.4
 
 ### Patch Changes
