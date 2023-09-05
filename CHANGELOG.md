@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- de1d99b: fix changeset
+- de1d99b: fix changeset and release
 
 ## null
 
