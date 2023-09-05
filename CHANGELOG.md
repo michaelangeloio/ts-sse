@@ -1,5 +1,11 @@
 # ts-sse
 
+## 0.0.4
+
+### Patch Changes
+
+- 8453ef9: fix new line write, don't use anything before this version please!
+
 ## 0.0.3
 
 ### Patch Changes
