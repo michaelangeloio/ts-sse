@@ -1,5 +1,11 @@
 # ts-sse
 
+## 0.0.1
+
+### Patch Changes
+
+- de1d99b: fix changeset
+
 ## null
 
 ### Patch Changes
