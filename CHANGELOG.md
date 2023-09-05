@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- 8453ef9: fix new line write
+- 8453ef9: fix new line write, don't use anything before this version please!
 
 ## 0.0.3
 
