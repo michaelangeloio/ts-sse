@@ -1,117 +1,205 @@
-# typescript-npm-package-template
+# ts-sse 
 
-> Template to kickstart creating a Node.js module using TypeScript and VSCode
+utilities for Server Sent Events that adopts the [HTML Spec Standard](https://html.spec.whatwg.org/multipage/server-sent-events.html) for the [EventSource Web API](https://developer.mozilla.org/en-US/docs/Web/API/EventSource). 
 
-Inspired by [node-module-boilerplate](https://github.com/sindresorhus/node-module-boilerplate)
+## Background
 
-## Features
+This is a TypeScript implementation of the [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) specification. This is to make sending Event Source streams easier to implement on the server side.
 
-- [Semantic Release](https://github.com/semantic-release/semantic-release)
-- [Issue Templates](https://github.com/ryansonshine/typescript-npm-package-template/tree/main/.github/ISSUE_TEMPLATE)
-- [GitHub Actions](https://github.com/ryansonshine/typescript-npm-package-template/tree/main/.github/workflows)
-- [Codecov](https://about.codecov.io/)
-- [VSCode Launch Configurations](https://github.com/ryansonshine/typescript-npm-package-template/blob/main/.vscode/launch.json)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Husky](https://github.com/typicode/husky)
-- [Lint Staged](https://github.com/okonet/lint-staged)
-- [Commitizen](https://github.com/search?q=commitizen)
-- [Jest](https://jestjs.io/)
-- [ESLint](https://eslint.org/)
-- [Prettier](https://prettier.io/)
+It's a lightweight wrapper around the Web API specification. It's not a polyfill. It's not a replacement. It's just a simple wrapper around [Streams](https://developer.mozilla.org/en-US/docs/Web/API/Streams_API) according to the [HTML Spec Standard](https://html.spec.whatwg.org/multipage/server-sent-events.html).
 
-## Getting started
+> ❗ This is not to be confused with Node's [Stream API](https://nodejs.org/api/stream.html). This is a wrapper around the [Web Streams API](https://developer.mozilla.org/en-US/docs/Web/API/Streams_API) which is also newly available in [Node 20 and above](https://nodejs.org/api/webstreams.html).
 
-### Set up your repository
+> For example, this utility accepts a [`WritableStreamDefaultWriter`](https://nodejs.org/api/webstreams.html#class-writablestreamdefaultwriter) and not a [`stream.Writable`](https://nodejs.org/api/stream.html#class-streamwritable).
 
-**Click the "Use this template" button.**
+This lib is **actually small enough to be a gist or directly copy pasta**. You can go to `writer.ts` and copy the code directly if you'd like.
 
-Alternatively, create a new directory and then run:
+## Acknowledgements
+
+This borrows from [`node-ssestream`](https://github.com/EventSource/node-ssestream/tree/master) and also Nestjs's [`sse`](https://github.com/nestjs/nest/blob/069b519a1c9f040e9a4ec273b422f15cd95d3844/packages/core/router/sse-stream.ts) implementation. 
+
+##  Getting Started with ts-sse (TypeScript Server-Sent Events)
 
 ```bash
-curl -fsSL https://github.com/ryansonshine/typescript-npm-package-template/archive/main.tar.gz | tar -xz --strip-components=1
+npm install ts-sse
 ```
 
-Replace `FULL_NAME`, `GITHUB_USER`, and `REPO_NAME` in the script below with your own details to personalize your new package:
+### Prerequisites
+- have TypeScript.
+- A basic understanding of [Server-Sent Events (SSE)]([HTML Spec Standard](https://html.spec.whatwg.org/multipage/server-sent-events.html)) and the [EventSource Web API](https://developer.mozilla.org/en-US/docs/Web/API/EventSource).
 
-```bash
-FULL_NAME="John Smith"
-GITHUB_USER="johnsmith"
-REPO_NAME="my-cool-package"
-sed -i.mybak "s/\([\/\"]\)(ryansonshine)/$GITHUB_USER/g; s/typescript-npm-package-template\|my-package-name/$REPO_NAME/g; s/Ryan Sonshine/$FULL_NAME/g" package.json package-lock.json README.md
-rm *.mybak
-```
 
-### Add NPM Token
+### Nextjs Example
 
-Add your npm token to your GitHub repository secrets as `NPM_TOKEN`.
+This wrapper is compatible with any server/runtime that can return a `responseStream.readable`. Here's an example with Nextjs that implements a "syncing" streaming route.
 
-### Add Codecov integration
-
-Enable the Codecov GitHub App [here](https://github.com/apps/codecov).
-
-**Remove everything from here and above**
-
----
-
-# my-package-name
-
-[![npm package][npm-img]][npm-url]
-[![Build Status][build-img]][build-url]
-[![Downloads][downloads-img]][downloads-url]
-[![Issues][issues-img]][issues-url]
-[![Code Coverage][codecov-img]][codecov-url]
-[![Commitizen Friendly][commitizen-img]][commitizen-url]
-[![Semantic Release][semantic-release-img]][semantic-release-url]
-
-> My awesome module
-
-## Install
-
-```bash
-npm install my-package-name
-```
-
-## Usage
 
 ```ts
-import { myPackage } from 'my-package-name';
+import { EventNotifier, getSSEWriter } from 'ts-sse'
+```
 
-myPackage('hello');
-//=> 'hello from my package'
+#### Define Your Message Schema
+Before you can send events, you need to define the `data` structure of the messages you'll be sending. This example uses zod, but you can just use pure TS too.
+
+```ts
+import { z } from 'zod';
+
+const syncSchema = z.object({
+  sync_status: z.enum(['begin_stream', 'error', 'sync_update', 'sync_complete']),
+  sync_message: z.string(),
+  sync_date: z.string(),
+});
+
+```
+
+#### Define Your Event Types
+```ts
+type SyncEvents = EventNotifier<{
+  update: {
+    data: z.infer<typeof syncSchema>
+    comment: string
+  }
+  complete: {
+    data: z.infer<typeof syncSchema>
+    event: 'some_event' | 'some_other_event'
+  }
+  close: {
+    data: never
+  }
+  error: {
+    data: never
+  }
+}>;
+```
+
+The `EventNotifier` is a generic type that takes in an object of event types: `update`, `complete`, `close`, and `error`.
+
+These event types take the following properties:
+
+- `data`: The main content of the message. It can be a string or an object.
+- `comment` (optional)
+- `event` (optional)
+- `id` (optional)
+- `retry` (optional)
+
+> these properties follow properties outlined in the HTML Spec Standard for [Server-Sent Events](https://html.spec.whatwg.org/multipage/server-sent-events.html). Search "process the field".
+
+#### Create Your SSE Stream
+Now, let's dive into some Next! Create a function that will handle the SSE logic:
+
+```ts
+// api/stream/route.ts
+export async function GET() {
+  // ... (authentication and other logic)
+
+  const responseStream = new TransformStream();
+  const writer = responseStream.writable.getWriter();
+  const encoder = new TextEncoder();
+
+  const syncStatusStream = async (notifier: SyncEvents) => {
+    // Begin the stream
+    notifier.update({
+      data: {
+        sync_status: 'begin_stream',
+      },
+    });
+
+    // ... (your logic for fetching data and sending updates)
+
+    // Example: Sending a sync update
+    notifier.update({
+      data: {
+        sync_status: 'sync_update',
+        sync_date: 'your-date-here',
+        sync_message: 'Syncing...',
+      },
+    });
+
+    // ... (more logic, handling errors, completion, etc.)
+  };
+
+  // Use the getSSEWriter to initialize the utility with the writer
+  syncStatusStream(getSSEWriter(writer, encoder));
+
+  // Return the response stream
+  return new NextResponse(responseStream.readable, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      Connection: 'keep-alive',
+      'Cache-Control': 'no-cache, no-transform',
+    },
+  });
+}
+
+```
+
+If you need to close the connection, you can call either `close`, `complete`, or `error` on the `notifier` object.
+
+```ts
+// api/stream/route.ts
+
+// ... (your logic for fetching data and sending updates)
+  notifier.complete({
+  data: {
+    sync_status: 'sync_complete',
+    sync_date: 'your-date-here',
+    sync_message: `I'm done!`,
+  },
+  });
+```
+
+If you want to run some custom behavior before or after the event is sent, you can pass in a callback to the `update` method for example.
+
+```ts
+// api/stream/route.ts
+
+// ... (your logic for fetching data and sending updates)
+notifier.update(
+  {
+    data: {
+      eventType: 'begin_stream',
+    },
+  },
+  {
+    beforeFn: (message) => {
+      syncSchema.parse(message.data)
+    },
+  },
+)
+```
+
+
+
+### Client Side
+
+You can use the [EventSource Web API](https://developer.mozilla.org/en-US/docs/Web/API/EventSource) to consume the stream.
+
+```ts
+'use client'
+// some-component.tsx
+
+const SomeComponent = () => {
+  const [syncStatus, setSyncStatus] = useState<SyncEvents['update']['data']>('begin_stream');
+
+  useEffect(() => {
+    const eventSource = new EventSource('/api/stream/route');
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data) as SyncEvents['update']['data'];
+      setSyncStatus(data.sync_status);
+    };
+    return () => {
+      eventSource.close();
+    };
+  }, []);
+
+  return (
+    <div>
+      <p>Sync Status: {syncStatus}</p>
+    </div>
+  );
+};
 ```
 
 ## API
 
-### myPackage(input, options?)
-
-#### input
-
-Type: `string`
-
-Lorem ipsum.
-
-#### options
-
-Type: `object`
-
-##### postfix
-
-Type: `string`
-Default: `rainbows`
-
-Lorem ipsum.
-
-[build-img]:https://github.com/ryansonshine/typescript-npm-package-template/actions/workflows/release.yml/badge.svg
-[build-url]:https://github.com/ryansonshine/typescript-npm-package-template/actions/workflows/release.yml
-[downloads-img]:https://img.shields.io/npm/dt/typescript-npm-package-template
-[downloads-url]:https://www.npmtrends.com/typescript-npm-package-template
-[npm-img]:https://img.shields.io/npm/v/typescript-npm-package-template
-[npm-url]:https://www.npmjs.com/package/typescript-npm-package-template
-[issues-img]:https://img.shields.io/github/issues/ryansonshine/typescript-npm-package-template
-[issues-url]:https://github.com/ryansonshine/typescript-npm-package-template/issues
-[codecov-img]:https://codecov.io/gh/ryansonshine/typescript-npm-package-template/branch/main/graph/badge.svg
-[codecov-url]:https://codecov.io/gh/ryansonshine/typescript-npm-package-template
-[semantic-release-img]:https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
-[semantic-release-url]:https://github.com/semantic-release/semantic-release
-[commitizen-img]:https://img.shields.io/badge/commitizen-friendly-brightgreen.svg
-[commitizen-url]:http://commitizen.github.io/cz-cli/
+See here for the full API: [API.md](./api.md)
