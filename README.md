@@ -31,9 +31,14 @@ npm install ts-sse
 
 ### Nextjs Example
 
-This wrapper is compatible with any server/runtime that can return a `responseStream.readable`. Here's an example with Nextjs that implements a "syncing" streaming route.
+Go to the [examples/next-app](./examples/next-app) directory for a full example.
+
+> the streaming route is at `/stream/route.tsx` and the client component is at `/StreamClient.tsx`
 
 
+> This wrapper is compatible with any server/runtime that can return a `responseStream.readable`. Below is an example with Nextjs that implements a "syncing" streaming route.
+
+#### Import the Utilities
 ```ts
 import { EventNotifier, getSSEWriter } from 'ts-sse'
 ```

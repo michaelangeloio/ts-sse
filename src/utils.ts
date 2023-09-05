@@ -15,6 +15,6 @@ export function toDataString(data: string | Record<string, unknown>): string {
 
   return data
     .split(/\r\n|\r|\n/)
-    .map((line) => `data: ${line}\n`)
+    .map((line) => `data: ${line}\n\n`)
     .join('')
 }
