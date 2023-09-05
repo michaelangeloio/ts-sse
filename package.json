@@ -13,6 +13,7 @@
     "lint": "eslint ./src/ --fix",
     "prepare": "husky install",
     "release": "npm run build && changeset publish",
+    "version-packages": "changeset version",
     "test:watch": "jest --watch",
     "test": "jest --coverage",
     "typecheck": "tsc --noEmit"

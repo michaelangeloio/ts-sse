@@ -33,8 +33,8 @@ jobs:
         with:
           title: Release Tracking
           # this expects you to have a script called release which does a build for your packages and calls changeset publish
-          publish: pnpm release
-          version: pnpm version-packages
+          publish: npm run release
+          version: npm run version-packages
           createGithubReleases: aggregate
           githubReleaseName: v${{ steps.release-version.outputs.current-version }}
           githubTagName: v${{ steps.release-version.outputs.current-version }}
