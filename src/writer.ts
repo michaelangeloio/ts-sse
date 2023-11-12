@@ -21,7 +21,7 @@ export interface EventNotifier<
       : never
     error: T['error'] extends Message ? Message<T['error']>['data'] : never
     close: T['close'] extends Message ? Message<T['close']>['data'] : never
-  } = any
+  } = any,
 > {
   update: (
     message: Message<T['update']>['data'],
